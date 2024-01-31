@@ -145,13 +145,15 @@ class ModelTrainer:
                 self.predictions_text_dict[(epochs, data_volume)] = candidates
                 self.bleu_score_dict[(epochs, data_volume)] = bleu_score
 
+            self.test_label_text = references
             self.history_dict[f'history_epochs_{epochs}'] = history_list
 
         return (self.history_dict,
                 self.predictions_dict,
                 self.predictions_text_dict,
                 self.test_label,
-                self.bleu_score_dict)
+                self.bleu_score_dict,
+                self.test_label_text)
 
 def save_predictions_to_hdf5(predictions_dict, filename_h5):
     with h5py.File(filename_h5, 'w') as f:
@@ -175,27 +177,35 @@ def save_test_label_to_hdf5(test_label, filename_h5):
             test_label = np.array(test_label)
         f.create_dataset('test_label', data=test_label)
 
-def save_bley_to_hdf5(bleu_score_dict, filename_h5):
+def save_bleu_to_hdf5(bleu_score_dict, filename_h5):
     with h5py.File(filename_h5, 'w') as f:
         for key, bleu in bleu_score_dict.items():
             if not isinstance(bleu, np.ndarray):
                 bleu = np.array(bleu)
             f.create_dataset(str(key), data=bleu)
 
-def save_predictions_text_to_json(predictions_text_dict, filename_json):
+def save_converted_text_to_json(predictions_text_dict, test_label_text, pred_json, label_json):
     converted_dict = {f'{key[0]}_{key[1]}': value for key, value in predictions_text_dict.items()}
-    with open(filename_json, 'w') as file:
+    with open(pred_json, 'w') as file:
         json.dump(converted_dict, file)
+
+    with open(label_json, 'w') as file:
+        json.dump(test_label_text, file)
 
 def save_tokenizer_to_json(tokenizer, filename_json):
     tokenizer_json = tokenizer.to_json()
     with open(filename_json, 'w', encoding='utf-8') as f:
         f.write(json.dumps(tokenizer_json, ensure_ascii=False))
 
-def display_image_with_caption(test_image, predictions, actual_texts, index):
+# print test image - predicted caption - test_label caption
+    # index: nums of rows for print(within test data size)
+    # key: choose certain predicted texts from predictions_text_dict
+        # insert type: (epochs, train_data_volume)
+def display_image_with_caption(test_image, predictions_text_dict, test_label_text, index, key):
+    predictions = predictions_text_dict.get(key)
     image = test_image[index]
     predicted_caption = predictions[index]
-    actual_caption = actual_texts[index]
+    actual_caption = test_label_text[index]
 
     plt.imshow(image)
     plt.title(f"predicted: {predicted_caption}\n actual: {actual_caption}")

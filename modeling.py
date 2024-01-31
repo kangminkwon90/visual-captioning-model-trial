@@ -81,16 +81,16 @@ def compile_model(model):
 from data_preprocess_for_model_train import data_for_model_train
 import pandas as pd
 import numpy as np
-
-df = pd.read_csv('./train_label/train_sample_2000.csv')
-image_folder = './train_image'
-
-(train_image, test_image,
-train_sequences, test_sequences,
-train_label, test_label,
- vocab_size, tokenizer, max_sequence_length) = data_for_model_train(df, image_folder, test_size=0.05)
-
-model_initial = create_model(vocab_size, 256, max_sequence_length)
-model = compile_model(model_initial)
-initial_weights = model.get_weights()
-model.summary()
+#
+# df = pd.read_csv('./train_label/train_sample_2000.csv')
+# image_folder = './train_image'
+#
+# (train_image, test_image,
+# train_sequences, test_sequences,
+# train_label, test_label,
+#  vocab_size, tokenizer, max_sequence_length) = data_for_model_train(df, image_folder, test_size=0.05)
+#
+# model_initial = create_model(vocab_size, 256, max_sequence_length)
+# model = compile_model(model_initial)
+# initial_weights = model.get_weights()
+# model.summary()
